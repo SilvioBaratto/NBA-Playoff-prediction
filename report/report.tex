@@ -19,6 +19,13 @@
 \usepackage{subfig}
 \usepackage{float}
 \pagestyle{empty}
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks   = true, %Colours links instead of ugly boxes
+  urlcolor     = black, %Colour for external hyperlinks
+  linkcolor    = black, %Colour of internal links
+  citecolor   = black %Colour of citations
+}
 
 \title{Machine Learning and Data Mining project:\\Predicting NBA playoff results}
 \author{Silvio Angelo Baratto Roldan}
@@ -31,8 +38,7 @@
 \maketitle
 
 \begin{abstract}
-Basketball is one of the most popular sports in the US and around the world and many sponsors invest large amounts of money for it
-in teams and players. The NBA playoffs are part of the NBA-related league. This competition consists of four rounds between eight Eastern Conference and Western Conference teams. The playoffs are made up in the eights, quarter-finals, semifinals and final of the Conference. Finally, the winners of each final of their conference clash with the other winner in the NBA Finals. Each round consists of 7 games, so it takes 4 games to win to move on to the next round.
+The NBA playoffs are part of the NBA-related league. This competition consists of four rounds between eight Eastern Conference and Western Conference teams. The playoffs are made up in the eights, quarter-finals, semifinals and final of the Conference. Finally, the winners of each final of their conference clash with the other winner in the NBA Finals. Each round consists of 7 games, so it takes 4 games to win to move on to the next round.
 \end{abstract}
 \section{Problem statement}
 \label{section: ProblemStatement}
@@ -41,9 +47,15 @@ The goal of this project is to create a model [\ref{fig:modelExplain}] that simu
 \label{section: AssesmentPerformanceIndexes}
 To select the best classifier to train the model and to use it in the simulations three different metrics have been taken in consideration:
 \begin{itemize}
-\item{\texttt{Accuracy}}: intuitive performance metric and very useful one when the dataset is balanced or slightly balanced.
-\item{\texttt{AUC}}: area under ROC that measure the classifier performance.
-\item{\texttt{MSE}}: measures of the averages of the squares of the errors that is, the average squared difference between the estimated values and the actual value.
+\item{\texttt{Accuracy}}: Accuracy it is defined as the number of true positives and true negatives divided by the number of true positives, true negatives, false positives, and false negatives.
+\begin{equation}
+Accuracy = \dfrac{TP + TN}{TP + TN + FP + FN}
+\end{equation}
+\item{\texttt{AUC}}: The Receiver Operator Characteristic (ROC) curve is an evaluation metric for binary classification problems. It is a probability curve that plots the TPR (True Positive Rate) against FPR (False Positive Rate) at various threshold values and essentially separates the ‘signal’ from the ‘noise’. The Area Under the Curve is the measure of the ability of a classifier to distinguish between classes and is used as a summary of the ROC curve. The higher the AUC, the better the performance of the model at distinguishing between the positive and negative classes.
+\item{\texttt{MSE}}: Measures of the averages of the squares of the errors that is, the average squared difference between the estimated values and the actual value.
+\begin{equation}
+MSE = \dfrac{\sum_{i = 1}^n (x_i - \hat{x_i})^2}{n}
+\end{equation}
 \end{itemize}
 \section{Proposed solution}
 \label{section: ProposedaSolution}
@@ -86,7 +98,7 @@ The model consists of three parts:
 \end{itemize}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{../plot/explain.jpeg}
+    \includegraphics[width=\textwidth]{model/explain.jpeg}
     \caption{Flow diagram}
     \label{fig:modelExplain}
 \end{figure}
@@ -113,10 +125,10 @@ In the project, the selection of the right classification model is central to th
 \end{table}
 \indent As you can see from table [\ref{tab:results}] Random Forest and Naive Bayes result the best models for both accuracy and average error. From table [\ref{tab:modelComparison}] we expected Naive Bayes perform worse than SVM but both models are sensitive to parameter optimization, without tuning the hyperparametres SVM performs better than Naive Bayes. Random Forest result the most accurate classifier. Despite this, in the game simulation the execution times for 5000 iterations were extremely higher for Random Forest compared to Naive Bayes and SVM. However, for the correct forecast of the scoreboard, the waiting time necessary for the simulation is not considered an essential metric, as the model predicts the result before the event of the playoffs and therefore does not require a forecast rate in real time. In conclusion, Random Forest is the model that is considered most appropriate to use to predict the final scoreboard. 
 \subsubsection{Model output}
-The figure below shows the output achieved after 5000 simulations of the playoffs of the current season 2021-2022, using Random Forest as a classifier. The program assigns a probability to all teams for each round. The team that receives the highest probability is the one that according to the model will advance to the next round. In the current season at the time of writing the report, the semifinals still have to be played (Heat - Celtics: 3-3, Warriors passed to the final), as can be seen with the exception of the Suns-Mavericks and Bucks-Celtics matches, the rest was correctly predicted. The reason for the mistake can be admitted to the fact that Suns and Bucks played below expectations.
+The figure below shows the output achieved after 5000 simulations of the playoffs of the current season 2021-2022, using Random Forest as a classifier. The program assigns a probability to all teams for each round. The team that receives the highest probability is the one that according to the model will advance to the next round. In the current season at the time of writing the report, the semifinals still have to be played (Heat - Celtics: 3-3, Warriors passed to the final), as can be seen with the exception of the Suns-Mavericks and Bucks-Celtics matches, the rest was correctly predicted. The reason for the mistake can be admitted to the fact that Suns and Bucks played below  expectations.
 \begin{figure}[h]
     \centering
-    \includegraphics[width=\textwidth]{../plot/playoffs.png}
+    \includegraphics[width=\textwidth]{model/playoffs.png}
     \caption{playoff season 2021-2022}
     \label{fig:playoffSeason2022}
 \end{figure}
