@@ -1,7 +1,8 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath,amssymb}
-\usepackage{paralist}
+\usepackage[english]{babel}
+\usepackage{comment}
 \usepackage{color}
 \usepackage[detect-weight=true, binary-units=true]{siunitx}
 \usepackage{pgfplots}
@@ -19,6 +20,7 @@
 \usepackage{subfig}
 \usepackage{float}
 \pagestyle{empty}
+\usepackage{babel,csquotes,xpatch}% recommended
 \usepackage{hyperref}
 \hypersetup{
   colorlinks   = true, %Colours links instead of ugly boxes
@@ -31,107 +33,60 @@
 \author{Silvio Angelo Baratto Roldan}
 \date{Course of AA $2021$-$2022$ - Data Science and Scientific Computing}
 
-
-
 \begin{document}
-
 \maketitle
-
 \begin{abstract}
-The NBA playoffs are part of the NBA-related league. This competition consists of four rounds between eight Eastern Conference and Western Conference teams. The playoffs are made up in the eights, quarter-finals, semifinals and final of the Conference. Finally, the winners of each final of their conference clash with the other winner in the NBA Finals. Each round consists of 7 games, so it takes 4 games to win to move on to the next round.
+The NBA playoffs are part of the NBA-related league ~\cite{Wikipedia-playoffs}. This competition consists of four rounds between eight Eastern Conference and Western Conference teams. The playoffs are made up in the eights, quarter-finals, semifinals and final of the Conference. Finally, the winners of each final of their conference clash with the other winner in the NBA Finals. Each round consists of 7 games, so it takes 4 games to win to move on to the next round.
 \end{abstract}
 \section{Problem statement}
+The goal of this project is  to predict the final outcome of the playoffs using the official statistics of all the games played by the NBA from January 2004 to March 2021. This report explains the implementation of the simulation program used. Briefly, the program works by taking as input the list of teams in the playoffs and simulates $N$ times $7$ matches for each round, returning as the final output a probability of victory for each team. In each match played, a Machine Learning model is used to predict the winner.
 \label{section: ProblemStatement}
-The goal of this project is to create a model [\ref{fig:modelExplain}] that simulates the complete playoff scoreboard and predicts the winner of each game and round. The model is composed by three parts: training the model, generating feature values and simulation.
-\section{Assessment and performance indexes}
-\label{section: AssesmentPerformanceIndexes}
-To select the best classifier to train the model and to use it in the simulations three different metrics have been taken in consideration:
-\begin{itemize}
-\item{\texttt{Accuracy}}: Accuracy it is defined as the number of true positives and true negatives divided by the number of true positives, true negatives, false positives, and false negatives.
-\begin{equation}
-Accuracy = \dfrac{TP + TN}{TP + TN + FP + FN}
-\end{equation}
-\item{\texttt{AUC}}: The Receiver Operator Characteristic (ROC) curve is an evaluation metric for binary classification problems. It is a probability curve that plots the TPR (True Positive Rate) against FPR (False Positive Rate) at various threshold values and essentially separates the ‘signal’ from the ‘noise’. The Area Under the Curve is the measure of the ability of a classifier to distinguish between classes and is used as a summary of the ROC curve. The higher the AUC, the better the performance of the model at distinguishing between the positive and negative classes.
-\item{\texttt{MSE}}: Measures of the averages of the squares of the errors that is, the average squared difference between the estimated values and the actual value.
-\begin{equation}
-MSE = \dfrac{\sum_{i = 1}^n (x_i - \hat{x_i})^2}{n}
-\end{equation}
-\end{itemize}
+\section{Data}
+\label{section: Data}
+The complete dataset available is made up of 5 .csv files: \emph{(games.csv, games details.csv, players.csv, ranking.csv, teams.csv)}. Only the data from \emph{games.csv} were used in this project. The features available for each row are: \emph{(game\_date, game\_id, home\_team, visitor\_team, field\_goal\_percentage\_home, field\_goal\_three\_point\_percentage\_home, free\_throws\_made\_home, rebound\_home, assists\_steals\_home, blocks\_home, field\_goal\_percentage\_visitor, field\_goal\_three\_point\_percentage\_visitor, free\_throws\_made\_visitor, rebound\_visitor, assists\_steals\_visitor, blocks\_visitor, home\_win, visitor\_win)}. The variables represent the statistics of each match played from January 2004 until March 2021 for both the home team and the visitor. The binary variable we want to predict is home\_win \{0,1\}, $ 0 $ defeat, $ 1 $ win.
 \section{Proposed solution}
 \label{section: ProposedaSolution}
-For the purpose of simulation high accuracy and low error were the goals when selecting the right model. At this purpose three different classifier have been taken in consideration. In the table below [\ref{tab:modelComparison}] is show the Pros e Cons between them
-\begin{table}[H]
-	\centering
-	\begin{tabular}{l|l|l|l|l}
-	\toprule
-	Model 			& interpretable 	& Accuracy 		& Training speed 	& Prediction speed	\\
-    \midrule
-    SVM				& No				& Higher							& Fast				& Fast				\\
-    \midrule
-    Random Forest 	& No				& Higher							& Slow				& Slow				\\
-    \midrule
-    Naive Bayes		& Moderate			& Lower								& Fast				& Fast          	\\
-	\bottomrule
-	\end{tabular}
-\caption{Pros e Cons between SVM, Random Forest and Naive Bayes}
-\label{tab:modelComparison}
-\end{table}
-\section{Experimental evaluation}
-\label{section: ExperimentalEvaluation}
-\subsection{Data}
-The complete dataset was composed by 5 .csv files:
-\begin{itemize}
-\item \texttt{games.csv} : all games from 2004 season to last update with the date, teams and some details like number of points, etc.
-\item \texttt{games\_details.csv} : details of games dataset, all statistics of players for a given game.
-\item \texttt{players.csv} : players details (name).
-\item \texttt{ranking.csv} : ranking of NBA given a day.
-\item \texttt{teams.csv} : all teams of NBA. 
-\end{itemize}
-To train the model, only the data present in the games and teams dataset were used. The variables used within the \texttt{games.csv} dataset are: field goal percentage, field goal three point percentage, free throws made, rebounds, assists, steals and blocks from January 2004 untill march 2021 both for the home and visitor teams. 
-\subsection{Procedure}
-\label{section: Procedure}
-The model consists of three parts:
-\begin{itemize}
-\item {\textbf{ML model selection}}: Initially, the data is analyzed and trained with a regression model to predict the probability of winning. 
-\item {\textbf{Generate feature values}}: To simulate the playoffs, feature data were artificially generated with the use of different statistical distributions. For this purpose, the most recent data in \texttt{games.csv} were used to generate new data, as they are more representative.
-\item {\textbf{Simulate playoff}}: Using the generated data, multiple game simulations are done. The winner of each game is predicted using the trained model. The final simulation result is the average of the simulation results.
-\end{itemize}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{model/explain.jpeg}
-    \caption{Flow diagram}
-    \label{fig:modelExplain}
+The proposed solution is to create a program that simulates the playoffs. This program consists of three main parts: a Machine Learning model capable of predicting the winner of a match, a stochastic features data generator on which to use the classifier, and finally the simulation program, which returns the final scoreboard. The figure below shows the flow diagram of the complete simulation model and the implementation for each part is explained in the sections below.
+\begin{figure}[h!]
+\centering
+\subfloat[][Simulation model flow diagram]
+{\includegraphics[width=\textwidth]{model/explain.jpeg}} \quad
+\label{fig:simulationModel}
 \end{figure}
+\subsection{Train the classifier}
+The goal is to create a function, which, taking two teams as input, returns the winner. To make the winner prediction, it was decided to test three different Machine Learning models, to compare their effectiveness and choose the best one. The Scikit-Learn library ~\cite{Scikit-Learn} in Python was used for the implementation of the models. The \emph{games.csv} dataset was divided by the $70\%$ training set and $30\%$ test set. To train the classifier it has been considered only the match statistics features, 10 in total. The output variable we want to predict is home\_win. Scikit-Learn allows us to use the models without hyperparameterization, so it was decided to make a comparison of the models with and without optimizations. The models have been optimized using the GridSearchCV ~\cite{GridSearchCV} function, which allows us to loop various fittings using combinations of hyperparameters chosen by us. Accuracy and AUC were chosen as metrics to evaluate the models.
+\subsubsection{Support Vector Machines}
+Using the default values ​​of the Scikit-Learn library  has been obtained an accuracy of $75\%$. It was therefore decided to use GridSearchCV to find the best fitting among the combinations of these parameters: ($C: [0.1, 1, 10], \gamma : [1, 0.5, 0.1, 0.01, 0.001]$, Kernel : [linear, poly, rbf]). The best fit was found for ($C: 0.1, \gamma: 1$, kernel: linear) bringing the accuracy to $83\%$.
+\subsubsection{Random Forest}
+With the default values, Random Forest obtained an accuracy of $83\%$. So it was decided to try this parameters on GridSearchCV: (n\_estimators: [100, 200, 300, 400, 500], max\_features: [auto, sqrt], max\_depth: [10, 20, 30, 40, 50], bootstrap: [True, False]). The best fit was found for (n\_estimators: 500, max\_features: sqrt, max\_depth: 50, bootstrap: True) but the accuracy remain $83\%$.
+\subsubsection{Naive Bayes}
+Naive Bayes does not have hyperparameters, and with this model an accuracy of $83\%$ was achieved.
+\subsubsection{Area Under the Curve classifiers}
+In addition to accuracy, the AUC was also considered, considering the value 1 as a positive label. The higher the AUC value, the better the classifier. Is possible to see that all three models obtained the same performance.
+\begin{figure}[h!]
+\centering
+\subfloat[][Optimize]
+{\includegraphics[width=.45\textwidth]{plots/auc_optimize.png}} \quad
+\subfloat[][Default]
+{\includegraphics[width=.45\textwidth]{plots/auc_default.png}} \\
+\caption{Comparison AUC with and without GridSearchCV}
+\label{fig:subfig}
+\end{figure}
+\label{section: ExperimentalEvaluation}
+\subsection{Generate feature values}
+To simulate the result of the playoffs it is also necessary to generate possible data on which to predict the future result of the games. To achieve this goal, a \emph{game\_sample} function has been created, which, taken as input two teams, generates possible features of a match. First of all, to create these features, the original dataset was taken considering the most recent data, therefore to predict the 2022 season it was considered from 2020 onwards. For each team it was created a separate datasets with the match statistics results they obtained in each game of \emph{games.csv}, therefore 5 features were taken as we do not distinguish the scores between home or visitor. Using the Fitter ~\cite{Fitter} library available for Python it was possible to obtain the statistical distribution for each of the 5 features for each team. The \emph{game\_sample} function in the simulator therefore generates a random sample of features from the distribution for each of the two input teams and by putting the features together it is possible to generate a possible result of a match between the two teams.
+\subsection{Simulate playoff}
+The simulator takes as input the list of teams admitted to the playoffs and is composed of three functions: (\emph{play\_ngames, play\_round, simulate}). The \emph{play\_ngames} function takes two teams as input and generates a sample of features using \emph{game\_sample} for each of the 7 games, the result for each game is predicted using the classifier. In the \emph{play\_round} function, \emph{play\_ngames} is repeated for each round, eliminating the eliminated teams from the list. Finally, to get a statistic and return a probability in the \emph{simulate} function, $N$ iterations of \emph{play\_round} are made and for each round of the playoffs it is kept track of the times in which a team has managed to pass to the next round. Therefore the final result of the simulation is the probability that a team has to move on to the next round.
 \subsection{Results and discussion}
 \label{ResultsAndDiscussion}
-In the project, the selection of the right classification model is central to the correct forecast of the scoreboard. In the section [\ref{section: ProposedaSolution}] the benefits of the three models chosen for the simulations have been listed. The table [\ref{tab:results}] shows the results:
-\begin{table}[H]
-	\centering
-	\begin{tabular}{c|c|c|c}
-	\toprule
-	& SVM & Random Forest & Naive Bayes\\
-    \midrule
-    Accuracy & $0.71$ & $0.84$ & $0.83$ \\
-    \midrule
-    AUC & $0.71$ & $0.83$ & $0.82$ \\
-    \midrule
-    MSE & $0.28$ & $0.16$ & $0.16$ \\
-    \midrule
-    Time & 1min, 15sec & 31min, 27sec & 51 sec \\
-	\bottomrule
-	\end{tabular}
-\caption{Metrics results}
-\label{tab:results}
-\end{table}
-\indent As you can see from table [\ref{tab:results}] Random Forest and Naive Bayes result the best models for both accuracy and average error. From table [\ref{tab:modelComparison}] we expected Naive Bayes perform worse than SVM but both models are sensitive to parameter optimization, without tuning the hyperparametres SVM performs better than Naive Bayes. Random Forest result the most accurate classifier. Despite this, in the game simulation the execution times for 5000 iterations were extremely higher for Random Forest compared to Naive Bayes and SVM. However, for the correct forecast of the scoreboard, the waiting time necessary for the simulation is not considered an essential metric, as the model predicts the result before the event of the playoffs and therefore does not require a forecast rate in real time. In conclusion, Random Forest is the model that is considered most appropriate to use to predict the final scoreboard. 
-\subsubsection{Model output}
-The figure below shows the output achieved after 5000 simulations of the playoffs of the current season 2021-2022, using Random Forest as a classifier. The program assigns a probability to all teams for each round. The team that receives the highest probability is the one that according to the model will advance to the next round. In the current season at the time of writing the report, the semifinals still have to be played (Heat - Celtics: 3-3, Warriors passed to the final), as can be seen with the exception of the Suns-Mavericks and Bucks-Celtics matches, the rest was correctly predicted. The reason for the mistake can be admitted to the fact that Suns and Bucks played below  expectations.
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=\textwidth]{model/playoffs.png}
-    \caption{playoff season 2021-2022}
-    \label{fig:playoffSeason2022}
-\end{figure}
-\section{Conclusion}
-The result in the figure \ref{fig:playoffSeason2022} predicts the result very well based on the statistics of the matches. These predictions could be further improved by adding player statistics, injuries, or playing strategies used in previous matches. 
+The figure below shows the output achieved after 5000 simulations of the playoffs of the current season 2021-2022, using Random Forest as a classifier. It is possible to see that with the exception of the Suns-Mavericks, Bucks-Celtics and Heat-Celtics matches, the rest was correctly predicted. The reason for the mistake can be admitted to the fact that Suns and Bucks played below expectations, Heat and Celtics was a very tight match and in general Celtics played beyond expectations, however the winner of the finals was correctly predicted. These predictions could be further improved by adding player statistics, injuries, or match strategies used in previous matches.  
+\begin{figure}[h!]
+\centering
+\subfloat[][playoffs]
+{\includegraphics[width=\textwidth]{model/playoffs.png}} \quad
+\label{fig:playoffs}
+\end{figure} 
+
+\bibliographystyle{plain}
+\bibliography{bibliography}
 \end{document}
