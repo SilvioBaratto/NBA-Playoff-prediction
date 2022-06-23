@@ -90,10 +90,7 @@ beyond expectations, however the winner of the finals was correctly predicted.
 These predictions could be further improved by adding player statistics, injuries,
 or match strategies used in previous matches.
 
-https://github.com/SilvioBaratto/NBA-Playoff-prediction/tree/main/report/model
-
-
-![alt text](https://github.com/SilvioBaratto/NBA-Playoff-prediction/tree/main/report/model/playoffs.png?raw=true)
+![alt text](https://github.com/SilvioBaratto/NBA-Playoff-prediction/tree/main/report/model/playoffs.png?raw=true "Title")
 
 
 
