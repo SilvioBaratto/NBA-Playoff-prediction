@@ -78,5 +78,22 @@ are made and for each round of the playoffs it is kept track of the times in whi
 a team has managed to pass to the next round. Therefore the final result of the
 simulation is the probability that a team has to move on to the next round.
 
+## 4 Results and discussion
+
+The figure below shows the output achieved after 5000 simulations of the play-
+offs of the current season 2021-2022, using Random Forest as a classifier. It
+is possible to see that with the exception of the Suns-Mavericks, Bucks-Celtics
+and Heat-Celtics matches, the rest was correctly predicted. The reason for the
+mistake can be admitted to the fact that Suns and Bucks played below expec-
+tations, Heat and Celtics was a very tight match and in general Celtics played
+beyond expectations, however the winner of the finals was correctly predicted.
+These predictions could be further improved by adding player statistics, injuries,
+or match strategies used in previous matches.
+
+https://github.com/SilvioBaratto/NBA-Playoff-prediction/tree/main/report/model
+
+
+![alt text](https://github.com/SilvioBaratto/NBA-Playoff-prediction/tree/main/report/model/playoffs.png?raw=true)
+
 
 
