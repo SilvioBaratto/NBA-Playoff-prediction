@@ -12,14 +12,14 @@ model is used to predict the winner.
 
 ## 2. Data 
 
-The complete dataset available is made up of 5 .csv files: \emph{(games.csv, games
-details.csv, players.csv, ranking.csv, teams.csv)}. Only the data from games.csv
-were used in this project. The features available for each row are: \emph{(game date,
+The complete dataset available is made up of 5 .csv files: **(games.csv, games
+details.csv, players.csv, ranking.csv, teams.csv)**. Only the data from games.csv
+were used in this project. The features available for each row are: (game date,
 game id, home team, visitor team, field goal percentage home, field goal three -
 point percentage home, free throws made home, rebound home, assists steals -
 home, blocks home, field goal percentage visitor, field goal three point percent-
 age visitor, free throws made visitor, rebound visitor, assists steals visitor, blocks -
-visitor, home win, visitor win)}. The variables represent the statistics of each
+visitor, home win, visitor win). The variables represent the statistics of each
 match played from January 2004 until March 2021 for both the home team and
 the visitor. The binary variable we want to predict is home win {0,1}, 0 defeat,
 1 win.
